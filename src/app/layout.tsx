@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   keywords: ['사주', '사주팔자', '만세력', 'AI사주', '신년운세', '오행', '천기누설', 'Gemini AI'],
   verification: {
     google: 'OAMkPNpmVxND4ut7MZb4btOjwZKyZqcL1j8qNk3AKOM',
+    other: {
+      'naver-site-verification': 'd495c7535bc14cab5cf19a2f6987e495609496a5',
+    },
   },
   openGraph: {
     title: '천기누설 (天機漏洩) - AI 맞춤형 모던 사주명리 리포트',
