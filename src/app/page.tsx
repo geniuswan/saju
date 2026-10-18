@@ -9,11 +9,9 @@ import { SajuReportView } from '@/components/SajuReportView';
 import { SajuChatModal } from '@/components/SajuChatModal';
 import { SajuShareCard } from '@/components/SajuShareCard';
 import { ProfileDrawer } from '@/components/ProfileDrawer';
-import { SettingsModal } from '@/components/SettingsModal';
 import {
   Sparkles,
   Users,
-  Settings,
   RotateCcw,
   Moon,
   Compass,
@@ -32,7 +30,6 @@ export default function Home() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isShareCardOpen, setIsShareCardOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // 로컬 스토리지 상태
   const [savedProfiles, setSavedProfiles] = useState<SajuProfile[]>([]);
@@ -234,14 +231,6 @@ export default function Home() {
                 </span>
               )}
             </button>
-
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white border border-neutral-700/80 transition-all"
-              title="API 설정"
-            >
-              <Settings className="w-4 h-4 text-neutral-300" />
-            </button>
           </div>
         </div>
       </header>
@@ -419,13 +408,6 @@ export default function Home() {
           });
         }}
         onDelete={handleDeleteProfile}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        customApiKey={customApiKey}
-        onSaveApiKey={handleSaveApiKey}
       />
     </div>
   );
