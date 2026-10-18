@@ -25,6 +25,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="dark">
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5365737367506293"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-screen bg-[#090a0f] text-neutral-100 antialiased">
         {children}
       </body>
