@@ -69,30 +69,48 @@ export const SajuChatModal: React.FC<Props> = ({
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/saju/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let replyText = '';
+      try {
+        const res = await fetch('/api/saju/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            manseryeok,
+            report,
+            history: [...messages, userMsg],
+            message: query,
+            customApiKey,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.reply) {
+            replyText = data.reply;
+          }
+        }
+      } catch {
+        // 정적 호스팅 환경 fallback
+      }
+
+      if (!replyText) {
+        const { chatWithSajuMaster } = await import('@/lib/gemini');
+        replyText = await chatWithSajuMaster(
           manseryeok,
           report,
-          history: [...messages, userMsg],
-          message: query,
-          customApiKey,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success && data.reply) {
-        const botMsg: ChatMessage = {
-          id: String(Date.now() + 1),
-          role: 'assistant',
-          content: data.reply,
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, botMsg]);
-      } else {
-        throw new Error(data.error || '답변 생성 실패');
+          [...messages, userMsg],
+          query,
+          customApiKey
+        );
       }
+
+      const botMsg: ChatMessage = {
+        id: String(Date.now() + 1),
+        role: 'assistant',
+        content: replyText,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
     } catch {
       const errorMsg: ChatMessage = {
         id: String(Date.now() + 1),

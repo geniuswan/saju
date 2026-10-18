@@ -67,35 +67,73 @@ export default function Home() {
   const handleAnalyze = async (input: SajuFormInput) => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/saju/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...input,
-          customApiKey: customApiKey || undefined,
-        }),
-      });
+      try {
+        const res = await fetch('/api/saju/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...input,
+            customApiKey: customApiKey || undefined,
+          }),
+        });
 
-      const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || '사주 분석 요청 실패');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setManseryeok(data.manseryeok);
+            setReport(data.report);
+            setIsAI(data.isAI);
+            localStorage.setItem(
+              'saju_last_analysis',
+              JSON.stringify({
+                manseryeok: data.manseryeok,
+                report: data.report,
+                isAI: data.isAI,
+              })
+            );
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+        }
+      } catch {
+        // 정적 호스팅(Cloudflare Pages 등)에서는 API 라우트 부재 시 클라이언트 직접 연산 진행
       }
 
-      setManseryeok(data.manseryeok);
-      setReport(data.report);
-      setIsAI(data.isAI);
+      // 클라이언트 직접 계산 및 Gemini 연동
+      const { calculateManseryeok } = await import('@/lib/saju/manseryeok');
+      const { analyzeSajuWithGemini } = await import('@/lib/gemini');
 
-      // 마지막 분석 결과 로컬 저장
+      const clientManseryeok = calculateManseryeok({
+        year: Number(input.year),
+        month: Number(input.month),
+        day: Number(input.day),
+        hour: input.hasTime && input.hour !== undefined ? Number(input.hour) : undefined,
+        minute: input.hasTime && input.minute !== undefined ? Number(input.minute) : undefined,
+        isLunar: Boolean(input.isLunar),
+        isLeapMonth: Boolean(input.isLeapMonth),
+        gender: input.gender,
+        name: String(input.name || '내담자'),
+        hasTime: Boolean(input.hasTime),
+      });
+
+      const { report: clientReport, isAI: clientIsAI } = await analyzeSajuWithGemini(
+        clientManseryeok,
+        customApiKey || undefined
+      );
+
+      setManseryeok(clientManseryeok);
+      setReport(clientReport);
+      setIsAI(clientIsAI);
+
       localStorage.setItem(
         'saju_last_analysis',
         JSON.stringify({
-          manseryeok: data.manseryeok,
-          report: data.report,
-          isAI: data.isAI,
+          manseryeok: clientManseryeok,
+          report: clientReport,
+          isAI: clientIsAI,
         })
       );
 
-      // 모바일 등에서 결과 영역으로 부드럽게 스크롤
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Analysis failed:', err);

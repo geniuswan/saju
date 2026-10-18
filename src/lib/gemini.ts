@@ -6,7 +6,7 @@ export async function analyzeSajuWithGemini(
   manseryeok: ManseryeokResult,
   customApiKey?: string
 ): Promise<{ report: SajuAnalysisReport; isAI: boolean }> {
-  const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+  const apiKey = customApiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     console.log('[Saju Web] No Gemini API key provided. Using high-fidelity local calculation engine.');
@@ -54,7 +54,7 @@ export async function chatWithSajuMaster(
   newMessage: string,
   customApiKey?: string
 ): Promise<string> {
-  const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+  const apiKey = customApiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     // API 키가 없을 때의 스마트 룰베이스 사주도사 응답
